@@ -21,9 +21,9 @@ class CreateTestPeruAppsUser extends Migration
             $table->string('user_name')->unique();
             $table->string('first_name');
             $table->string('last_name');
+            $table->binary('profile_image')->nullable();
             $table->text('password');
             $table->string('email')->unique();
-            $table->boolean('status');
             $table->ipAddress('visitor');
             $table->timestamps();
             $table->softDeletes();

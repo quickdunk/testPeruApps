@@ -22,7 +22,6 @@ class UserTableSeeder extends Seeder
                 'last_name' => $faker->lastName,
                 'password' => $faker->password,
                 'email' => $faker->email,
-                'status' => ($faker->boolean?1:0),
                 'visitor' => $faker->ipv4
             ]);
         }

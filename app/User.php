@@ -10,10 +10,10 @@ class User extends Model
 {
     use SoftDeletes;
     protected $table = "user";
-    protected $fillable = ["user_name","first_name","last_name","password","email","status","visitor"];
+    protected $fillable = ["user_name","first_name","last_name","password","email","visitor"];
 
     public static function showPublicUserData(int $p_id){
-        return User::select("user_name","password","first_name","last_name","email","status","visitor")->where("id", $p_id)->get();
+        return User::select("user_name","password","first_name","last_name","email","visitor")->where("id", $p_id)->get();
     }
 
     public function getUserListPaginateAndFilter(Request $request){

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Traits\UploadTrait;
 
 class UserController extends Controller
 {
+    use UploadTrait;
     /**
      * Display a listing of the resource.
      *
@@ -59,7 +61,6 @@ class UserController extends Controller
         $o_user->last_name = $request->last_name;
         $o_user->password = $request->password;
         $o_user->email = $request->email;
-        $o_user->status = 1;
         $o_user->visitor = $request->ip();
         $o_user->save();
     }
@@ -120,6 +121,24 @@ class UserController extends Controller
             $o_user->delete();
         } else {
             // not found
+        }
+    }
+
+    public function uploadProfileImage(Request $request, $id){
+
+        $o_user = User::find($id);
+        if($o_user && $request->has("profile_image")){
+            $request->validate([
+                'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ]);
+            $image =$request->file('profile_image'); 
+            $s_file_name = str_slug($request->input('name')).'_'.time();
+            $s_folder = "/uploads/images/";
+            $s_file_path = $s_folder . $s_file_name. '.' . $image->getClientOriginalExtension();
+            $this->uploadOne($image, $s_folder, 'public', $s_file_name);
+            
+            $o_user->profile_image = "/storage".$s_file_path;
+            $o_user->save();
         }
     }
 }
