@@ -50,6 +50,7 @@ La aplicación tiene disponible las siguientes rutas:
 
 # Tecnología y características
 
+-   La configuración de la base de datos se encuentra en el archivo **_.env_**. El nombre de la base de datos es **testperuapps**
 -   Para la seguridad se utilizó JSON Web Tokens (https://github.com/tymondesigns/jwt-auth)
 -   Para la paginación se usó características de Laravel (https://laravel.com/docs/5.8/pagination#paginating-eloquent-results)
 -   Para la población de datos se usó Faker (https://github.com/fzaninotto/Faker)
