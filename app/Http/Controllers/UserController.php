@@ -5,10 +5,55 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Traits\UploadTrait;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     use UploadTrait;
+
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['login']]);
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only(['user_name', 'password']);
+
+        if (!$token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    public function logout(Request $request)
+    {
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
+    /**
+     * Get the token array structure.
+     *
+     * @param string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => auth()->user(),
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -59,7 +104,7 @@ class UserController extends Controller
         $o_user->user_name = $request->user_name;
         $o_user->first_name = $request->first_name;
         $o_user->last_name = $request->last_name;
-        $o_user->password = $request->password;
+        $o_user->password = Hash::make($request->password);
         $o_user->email = $request->email;
         $o_user->visitor = $request->ip();
         $o_user->save();
@@ -97,10 +142,10 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $o_user = User::find($id);
-        if($o_user){
+        if ($o_user) {
             $a_input = $request->all();
-            foreach($a_input as $col => $value){
-                $o_user->$col = $value; 
+            foreach ($a_input as $col => $value) {
+                $o_user->$col = $value;
             }
             $o_user->save();
         } else {
@@ -117,21 +162,21 @@ class UserController extends Controller
     public function destroy($id)
     {
         $o_user = User::find($id);
-        if($o_user){
+        if ($o_user) {
             $o_user->delete();
         } else {
             // not found
         }
     }
 
-    public function uploadProfileImage(Request $request, $id){
-
+    public function uploadProfileImage(Request $request, $id)
+    {
         $o_user = User::find($id);
-        if($o_user && $request->has("profile_image")){
+        if ($o_user && $request->has("profile_image")) {
             $request->validate([
                 'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
-            $image =$request->file('profile_image'); 
+            $image =$request->file('profile_image');
             $s_file_name = str_slug($request->input('name')).'_'.time();
             $s_folder = "/uploads/images/";
             $s_file_path = $s_folder . $s_file_name. '.' . $image->getClientOriginalExtension();

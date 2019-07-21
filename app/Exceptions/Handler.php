@@ -4,9 +4,14 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
+    protected $a_response = array(
+        "code" => 500,
+        "message" => "Error desconocido"
+    );
     /**
      * A list of the exception types that are not reported.
      *
@@ -46,6 +51,21 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+            return response()->json(['error' => 'token is expired'], 400);
+        } elseif ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+            return response()->json(['error' => 'token is invalid'], 400);
+        } elseif ($exception instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
+            return response()->json(['error' => 'token absent'], 400);
+        }
         return parent::render($request, $exception);
+    }
+
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        $this->a_response["code"] = 401;
+        $this->a_response["message"] = "No tiene permisos de acceso";
+        return response()->json($this->a_response, 401);
     }
 }

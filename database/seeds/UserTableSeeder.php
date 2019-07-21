@@ -17,12 +17,12 @@ class UserTableSeeder extends Seeder
         $faker = \Faker\Factory::create();
         for ($i = 0; $i < 50; $i++) {
             User::create([
-                'user_name' => $faker->userName,
-                'first_name' => $faker->firstName,
-                'last_name' => $faker->lastName,
-                'password' => $faker->password,
-                'email' => $faker->email,
-                'visitor' => $faker->ipv4
+                "user_name" => $faker->userName,
+                "first_name" => $faker->firstName,
+                "last_name" => $faker->lastName,
+                "password" => Hash::make("adminadmin"),
+                "email" => $faker->email,
+                "visitor" => $faker->ipv4
             ]);
         }
     }

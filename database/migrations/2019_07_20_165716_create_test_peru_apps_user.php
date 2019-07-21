@@ -13,23 +13,22 @@ class CreateTestPeruAppsUser extends Migration
      */
     public function up()
     {
-        Schema::create('user', function (Blueprint $table) {
-            $table->charset = 'latin1';
-            $table->collation  = 'latin1_spanish_ci';
+        Schema::create("user", function (Blueprint $table) {
+            $table->charset = "latin1";
+            $table->collation  = "latin1_spanish_ci";
             
-            $table->bigIncrements('id')->autoIncrement();
-            $table->string('user_name')->unique();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->binary('profile_image')->nullable();
-            $table->text('password');
-            $table->string('email')->unique();
-            $table->ipAddress('visitor');
+            $table->bigIncrements("id")->autoIncrement();
+            $table->string("user_name")->unique();
+            $table->string("first_name");
+            $table->string("last_name");
+            $table->binary("profile_image")->nullable();
+            $table->text("password");
+            $table->string("email")->unique();
+            $table->ipAddress("visitor");
             $table->timestamps();
             $table->softDeletes();
-            
-            $table->index(['first_name', 'last_name']);
-            
+            $table->rememberToken();
+            $table->index(["first_name", "last_name"]);
         });
     }
 
@@ -40,7 +39,6 @@ class CreateTestPeruAppsUser extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists("user");
     }
 }
-

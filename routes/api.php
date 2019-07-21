@@ -13,9 +13,30 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+/*
+Route::middleware("auth:api")->get("/user", function (Request $request) {
     return $request->user();
 });
 
-Route::resource('user', 'UserController');
-Route::post('user/profile/update/{id}', 'UserController@uploadProfileImage')->name('profile.update');
+Route::resource("user", "UserController");
+Route::post("user/profile/update/{id}", "UserController@uploadProfileImage")->name("profile.update");
+Route::post("user/login", "UserController@login")->name("user.login");
+Route::post("user/logout", "UserController@logout")->name("user.logout");
+*/
+
+Route::group(['middleware' => 'api'], function () {
+    Route::resource('user', 'UserController', ['except' => ['login']]);
+    Route::post("user/profile/update/{id}", "UserController@uploadProfileImage")->name("profile.update");
+    Route::post("user/login", "UserController@login")->name("user.login");
+    Route::post("user/logout", "UserController@logout")->name("user.logout");
+});
+
+// Route::group([
+
+//     'middleware' => 'api',
+//     'prefix' => 'auth'
+
+// ], function ($router) {
+//     Route::post('login', 'UserController@login');
+//     Route::post('logout', 'UserController@logout');
+// });
