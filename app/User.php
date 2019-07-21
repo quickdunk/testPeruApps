@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Model implements JWTSubject
 {
@@ -26,7 +27,7 @@ class User extends Model implements JWTSubject
     {
         $o_user = $this;
         $a_queries_filter = [] ;
-        $a_valid_filters = ["user_name","first_name","last_name"];
+        $a_valid_filters = ["user_name","first_name","last_name","email"];
 
         foreach ($a_valid_filters as $col) {
             if ($request->has($col)) {
@@ -44,6 +45,26 @@ class User extends Model implements JWTSubject
         }
         
         return $o_user->paginate($i_rows)->appends($a_queries_filter);
+    }
+
+    public function easyUpdate(Request $request)
+    {
+        $o_user = $this;
+
+        $a_queries_filter = [] ;
+        $a_cols_4_update = ["user_name","first_name","last_name","password","email"];
+
+        foreach ($a_cols_4_update as $col) {
+            if ($request->has($col)) {
+                if ($col=="password") {
+                    $o_user->$col = Hash::make($request->$col);
+                } else {
+                    $o_user->$col = $request->$col;
+                }
+            }
+        }
+
+        $o_user->save();
     }
 
     public function getJWTIdentifier()

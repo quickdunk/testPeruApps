@@ -93,6 +93,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $validatedData = $request->validate([
+            'user_name' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'password' => 'required',
+            'email' => 'required'
+
+        ]);
+
         $o_user = new User;
 
         $o_user->user_name = $request->user_name;
@@ -140,11 +149,7 @@ class UserController extends Controller
     {
         $o_user = User::find($id);
         if ($o_user) {
-            $a_input = $request->all();
-            foreach ($a_input as $col => $value) {
-                $o_user->$col = $value;
-            }
-            $o_user->save();
+            $o_user->easyUpdate($request);
         } else {
             $this->a_response["message"] = "User not found";
         }
@@ -171,6 +176,10 @@ class UserController extends Controller
 
     public function uploadProfileImage(Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'profile_image' => 'required'
+        ]);
+
         $o_user = User::find($id);
         if ($o_user && $request->has("profile_image")) {
             $request->validate([

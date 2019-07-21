@@ -60,6 +60,13 @@ class Handler extends ExceptionHandler
         } elseif ($exception instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
             $this->a_response["message"] = "token absent";
             return response()->json($this->a_response, 400);
+        } else {
+            if ($exception->getCode()==23000) {
+                $this->a_response["message"] = "Database UNIQUE constraint exception. Maybe one field data already exists, please verify your data.";
+            } else {
+                $this->a_response["message"] = $exception->getMessage();
+            }
+            return response()->json($this->a_response, 500);
         }
         return parent::render($request, $exception);
     }
