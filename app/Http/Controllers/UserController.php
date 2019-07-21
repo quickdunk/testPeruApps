@@ -124,6 +124,10 @@ class UserController extends Controller
     public function show($id)
     {
         $this->a_response["data"]  = User::showPublicUserData($id);
+        if (count($this->a_response["data"]) == 0) {
+            unset($this->a_response["data"]);
+            $this->a_response["message"] = "User not found";
+        }
         return $this->a_response;
     }
 
