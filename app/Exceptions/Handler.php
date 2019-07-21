@@ -52,11 +52,14 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-            return response()->json(['error' => 'token is expired'], 400);
+            $this->a_response["message"] = "token is expired";
+            return response()->json($this->a_response, 400);
         } elseif ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
-            return response()->json(['error' => 'token is invalid'], 400);
+            $this->a_response["message"] = "token is invalid";
+            return response()->json($this->a_response, 400);
         } elseif ($exception instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
-            return response()->json(['error' => 'token absent'], 400);
+            $this->a_response["message"] = "token absent";
+            return response()->json($this->a_response, 400);
         }
         return parent::render($request, $exception);
     }
@@ -65,7 +68,7 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         $this->a_response["code"] = 401;
-        $this->a_response["message"] = "No tiene permisos de acceso";
+        $this->a_response["message"] = "You are not authorized";
         return response()->json($this->a_response, 401);
     }
 }

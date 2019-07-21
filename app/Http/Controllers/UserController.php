@@ -11,6 +11,11 @@ class UserController extends Controller
 {
     use UploadTrait;
 
+    protected $a_response = array(
+        "code" => 200,
+        "message" => "Success"
+    );
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['login']]);
@@ -21,7 +26,9 @@ class UserController extends Controller
         $credentials = $request->only(['user_name', 'password']);
 
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            $this->a_response["message"] = "User or password invalid";
+            $this->a_response["code"] = 401;
+            return response()->json($this->a_response, 401);
         }
 
         return $this->respondWithToken($token);
@@ -30,7 +37,8 @@ class UserController extends Controller
     public function logout(Request $request)
     {
         auth()->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        $this->a_response["message"] = "Successfully logged out";
+        return response()->json($this->a_response);
     }
 
     public function refresh()
@@ -46,12 +54,13 @@ class UserController extends Controller
      */
     protected function respondWithToken($token)
     {
-        return response()->json([
+        $this->a_response["data"] = [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => auth()->user(),
-        ]);
+        ];
+        return response()->json($this->a_response);
     }
 
     /**
@@ -62,23 +71,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $o_user = new User;
-
-        return $o_user->getUserListPaginateAndFilter($request);
-        // $a_queries_filter = [] ;
-        // $a_valid_filters = ["user_name","first_name","last_name"];
-
-        // foreach($a_valid_filters as $col){
-        //     if($request->has($col)){
-        //         $o_user = $o_user->where($col,'LIKE',$request->$col."%");
-        //         $a_queries_filter[$col] = $request->$col;
-        //     }
-        // }
-        
-        // if($request->has('sort')){
-        //     $o_user = $o_user->orderBy('last_name',$request->sort);
-        // }
-
-        // return $o_user->paginate(10)->appends($a_queries_filter);
+        $this->a_response["data"]  = $o_user->getUserListPaginateAndFilter($request);
+        return $this->a_response;
     }
 
     /**
@@ -108,6 +102,8 @@ class UserController extends Controller
         $o_user->email = $request->email;
         $o_user->visitor = $request->ip();
         $o_user->save();
+
+        return $this->a_response;
     }
 
     /**
@@ -118,7 +114,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return User::showPublicUserData($id);
+        $this->a_response["data"]  = User::showPublicUserData($id);
+        return $this->a_response;
     }
 
     /**
@@ -149,8 +146,10 @@ class UserController extends Controller
             }
             $o_user->save();
         } else {
-            // not found
+            $this->a_response["message"] = "User not found";
         }
+
+        return $this->a_response;
     }
 
     /**
@@ -165,8 +164,9 @@ class UserController extends Controller
         if ($o_user) {
             $o_user->delete();
         } else {
-            // not found
+            $this->a_response["message"] = "User not found";
         }
+        return $this->a_response;
     }
 
     public function uploadProfileImage(Request $request, $id)
@@ -184,6 +184,9 @@ class UserController extends Controller
             
             $o_user->profile_image = "/storage".$s_file_path;
             $o_user->save();
+        } else {
+            $this->a_response["message"] = "User not found";
         }
+        return $this->a_response;
     }
 }
