@@ -20,7 +20,7 @@ class User extends Model implements JWTSubject
 
     public static function showPublicUserData(int $p_id)
     {
-        return User::select("user_name", "password", "first_name", "last_name", "email", "visitor")->where("id", $p_id)->get();
+        return User::select("user_name", "password", "first_name", "last_name", "email", "visitor", "profile_image")->where("id", $p_id)->get();
     }
 
     public function getUserListPaginateAndFilter(Request $request)
